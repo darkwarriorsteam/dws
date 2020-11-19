@@ -1,0 +1,14 @@
+{
+  "name": "darkwarriors-support",
+  "version": "1.0.0",
+  "description": "Dark Warriors Support BotJS",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Michi 'NoRysq' Hupf",
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^12.4.1"
+  }
+}
