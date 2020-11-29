@@ -37,16 +37,18 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MessageHandler = void 0;
+var FileManager_1 = require("./FileManager");
 var index_1 = require("./index");
 var MessageHandler = /** @class */ (function () {
     function MessageHandler() {
     }
     MessageHandler.prototype.handleServerMessage = function (msg) {
         return __awaiter(this, void 0, void 0, function () {
-            var verificationService, ticketingManager, member, args;
+            var verificationService, ticketingManager, eventRoleManager, member, args, file, args, role;
             return __generator(this, function (_a) {
                 verificationService = index_1.MainProcess.getVerificationInstance();
                 ticketingManager = index_1.MainProcess.getTicketingManager();
+                eventRoleManager = index_1.MainProcess.getEventRoleManager();
                 //Return if author is bot
                 if (msg.author.bot)
                     return [2 /*return*/];
@@ -73,7 +75,7 @@ var MessageHandler = /** @class */ (function () {
                     return [2 /*return*/];
                 }
                 //!!resetv
-                if (msg.content.startsWith('!!resetv')) {
+                else if (msg.content.startsWith('!!resetv')) {
                     if (!member.roles.cache.some(function (role) { return role.name === 'OWNER'; })) {
                         console.log("Verification Service || User " + msg.author.tag + " tried to reset the verification message whilst no permission to do so.");
                         return [2 /*return*/];
@@ -84,13 +86,16 @@ var MessageHandler = /** @class */ (function () {
                     msg.delete();
                 }
                 //!!ticket
-                if (msg.content.startsWith('!!ticket')) {
+                else if (msg.content.startsWith('!!ticket')) {
                     args = msg.content.split(' ');
                     if (args.length === 2) {
                         //ticket start command
                         if (args[1].toLowerCase() === 'start') {
                             //start the ticket listener
                             ticketingManager.startListening(msg.guild);
+                            file = FileManager_1.BotFiles.ticketing();
+                            file.data.guildId = msg.guild;
+                            FileManager_1.FileManager.write(FileManager_1.BotFiles.ticketing.prototype.path(), file);
                         }
                     }
                     else if (args.length === 3) {
@@ -110,9 +115,46 @@ var MessageHandler = /** @class */ (function () {
                         }
                     }
                 }
+                //!!event
+                else if (msg.content.startsWith('!!event')) {
+                    args = msg.content.split(' ');
+                    if (args.length === 2) {
+                        if (args[1].toLowerCase() === 'start') {
+                            eventRoleManager.startListening(msg.guild);
+                        }
+                    }
+                    else if (args.length === 3) {
+                        if (args[1].toLowerCase() === 'init') {
+                            if (args[2].toLowerCase() === 'event') {
+                                eventRoleManager.setupRegistrationChannel(msg.channel);
+                            }
+                            else if (args[2].toLowerCase() === 'team') {
+                                eventRoleManager.setupEventLogChannel(msg.channel);
+                            }
+                        }
+                        else if (args[1].toLowerCase() === 'role') {
+                            role = this.getRoleFromMention(args[2], msg.guild);
+                            if (!role)
+                                return [2 /*return*/];
+                            eventRoleManager.setupEventRole(role);
+                        }
+                    }
+                }
                 return [2 /*return*/];
             });
         });
+    };
+    MessageHandler.prototype.getUserFormMention = function () {
+        //not implemented
+    };
+    MessageHandler.prototype.getRoleFromMention = function (mention, guild) {
+        if (!mention)
+            return undefined;
+        if (mention.startsWith('<@&') && mention.endsWith('>')) {
+            mention = mention.slice(3, -1);
+            return guild.roles.cache.get(mention);
+        }
+        return undefined;
     };
     return MessageHandler;
 }());

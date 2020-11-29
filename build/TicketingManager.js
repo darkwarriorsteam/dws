@@ -49,13 +49,11 @@ var TicketingManager = /** @class */ (function () {
             }
             var timeout = setTimeout(function () {
                 var user = msg.author;
-                console.log(supportContent);
-                console.log(supportContent[user.id]);
-                console.log(supportContent[user.id].content);
                 var embed = EmbedBuilder_1.EmbedBuilder.getTicketingEmbed(user, supportContent[user.id].content);
                 ticketTeamChannel.send(embed).then(function () {
                     user.send('Deine Supportanfrage hat uns gerade erreicht. Wir versuchen dir so schnell wie möglich zu helfen :D');
                     user.send(embed);
+                    supportContent[user.id] = undefined;
                 });
             }, 30000);
             supportContent[msg.author.id].timeout = timeout;

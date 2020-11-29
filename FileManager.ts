@@ -19,12 +19,19 @@ export class BotFiles {
     return require('./json/verification.json');
   }
 
+  static events() {
+    return require('./json/events.json');
+  }
+
   static init() {
     this.ticketing.prototype.path = () => {
       return './build/json/ticketing.json';
     }
     this.verification.prototype.path = () => {
       return './build/json/verification.json';
+    }
+    this.events.prototype.path = () => {
+      return './build/json/events.json';
     }
   }
 }

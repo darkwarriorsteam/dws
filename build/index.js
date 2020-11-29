@@ -44,42 +44,59 @@ var MessageHandler_1 = require("./MessageHandler");
 var process_1 = require("process");
 var TicketingManager_1 = require("./TicketingManager");
 var FileManager_1 = require("./FileManager");
+var EventRoleManager_1 = require("./EventRoleManager");
+//create classes to handle features
 var mh = new MessageHandler_1.MessageHandler();
 var vs = new VerificationService_1.VerificationService();
 var tm = new TicketingManager_1.TicketingManager();
+var erm = new EventRoleManager_1.EventRoleManager();
 var MainProcess = /** @class */ (function () {
     function MainProcess() {
     }
+    //returns TicketingManager instance
     MainProcess.getTicketingManager = function () {
         return tm;
     };
-    MainProcess.getClient = function () {
-        return client;
-    };
+    //returns VerificationService instance
     MainProcess.getVerificationInstance = function () {
         return vs;
     };
+    //returns VerificationService instance
+    MainProcess.getEventRoleManager = function () {
+        return erm;
+    };
+    //returns client object
+    MainProcess.getClient = function () {
+        return client;
+    };
     MainProcess.loginClient = function () {
+        //login client with token
         client.login(process.env.DCTKN_TEST);
     };
     MainProcess.assignEvents = function () {
         var _this = this;
+        //when client is ready this event fires
         client.on('ready', function () { return __awaiter(_this, void 0, void 0, function () {
             return __generator(this, function (_a) {
+                //check if client user is null
                 if (client.user === null) {
                     console.log("Client User is null");
                     process_1.exit;
                     return [2 /*return*/];
                 }
                 console.log("Logged in as " + client.user.tag);
+                //make prototype.path for files
                 FileManager_1.BotFiles.init();
+                //start VerificationService instance
                 vs.start();
                 console.log(1, vs);
                 return [2 /*return*/];
             });
         }); });
+        //event fires when bot receives message from all sources
         client.on('message', function (msg) { return __awaiter(_this, void 0, void 0, function () {
             return __generator(this, function (_a) {
+                //handle message from guilds
                 mh.handleServerMessage(msg);
                 return [2 /*return*/];
             });

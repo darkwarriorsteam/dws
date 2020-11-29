@@ -35,15 +35,12 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VerificationService = void 0;
 var Discord = require('discord.js');
 var EmbedBuilder_1 = require("./EmbedBuilder");
-var fs_1 = __importDefault(require("fs"));
 var index_1 = require("./index");
+var FileManager_1 = require("./FileManager");
 var VerificationService = /** @class */ (function () {
     function VerificationService() {
         this.messageId = this.channelId = this.guildId = null;
@@ -114,30 +111,26 @@ var VerificationService = /** @class */ (function () {
     };
     VerificationService.prototype.refresh = function () {
         var file = require('./json/verification.json');
-        this.messageId = file.data.verification.messageId;
-        this.channelId = file.data.verification.channelId;
-        this.guildId = file.data.verification.guildId;
-        this.rolesToAdd = file.data.verification.rolesToAdd;
-        this.rolesToRemove = file.data.verification.rolesToRemove;
-        this.defaultRoles = file.data.verification.defaultRoles;
+        this.messageId = file.data.messageId;
+        this.channelId = file.data.channelId;
+        this.guildId = file.data.guildId;
+        this.rolesToAdd = file.data.rolesToAdd;
+        this.rolesToRemove = file.data.rolesToRemove;
+        this.defaultRoles = file.data.defaultRoles;
     };
     VerificationService.prototype.refreshFileData = function (msg) {
-        var file = require('./json/verification.json');
-        file.data.verification.messageId = msg.id;
-        file.data.verification.channelId = msg.channel.id;
-        file.data.verification.guildId = msg.guild.id;
-        fs_1.default.writeFile('./json/verification.json', JSON.stringify(file), function (err) {
-            console.log(err === null ? "No errors occoured during file writing" : "Error occoured during file writing: " + err);
-        });
+        var file = FileManager_1.BotFiles.verification();
+        file.data.messageId = msg.id;
+        file.data.channelId = msg.channel.id;
+        file.data.guildId = msg.guild.id;
+        FileManager_1.FileManager.write(FileManager_1.BotFiles.verification.prototype.path(), file);
     };
     VerificationService.prototype.resetVerificationData = function () {
-        var file = require('./json/verification.json');
-        file.data.verification.messageId = null;
-        file.data.verification.channelId = null;
-        file.data.verification.guildId = null;
-        fs_1.default.writeFile('./json/verification.json', JSON.stringify(file), function (err) {
-            console.log(err === null ? "No errors occoured during file writing" : "Error occoured during file writing: " + err);
-        });
+        var file = FileManager_1.BotFiles.verification();
+        file.data.messageId = null;
+        file.data.channelId = null;
+        file.data.guildId = null;
+        FileManager_1.FileManager.write(FileManager_1.BotFiles.verification.prototype.path(), file);
     };
     VerificationService.prototype.startListeners = function () {
         return __awaiter(this, void 0, void 0, function () {

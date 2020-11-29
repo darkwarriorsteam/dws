@@ -3,6 +3,7 @@ import { EmbedBuilder } from './EmbedBuilder';
 import { Guild, GuildChannel, GuildMember, Message, MessageEmbed } from 'discord.js';
 import fs from 'fs';
 import { MainProcess } from './index';
+import { BotFiles, FileManager } from './FileManager';
 
 export class VerificationService {
   messageId: any;
@@ -50,43 +51,40 @@ export class VerificationService {
   refresh() {
     var file = require('./json/verification.json');
 
-    this.messageId = file.data.verification.messageId;
-    this.channelId = file.data.verification.channelId;
-    this.guildId = file.data.verification.guildId;
-    this.rolesToAdd = file.data.verification.rolesToAdd;
-    this.rolesToRemove = file.data.verification.rolesToRemove;
-    this.defaultRoles = file.data.verification.defaultRoles;
+    this.messageId = file.data.messageId;
+    this.channelId = file.data.channelId;
+    this.guildId = file.data.guildId;
+    this.rolesToAdd = file.data.rolesToAdd;
+    this.rolesToRemove = file.data.rolesToRemove;
+    this.defaultRoles = file.data.defaultRoles;
   }
 
   refreshFileData(msg: Message) {
-    var file = require('./json/verification.json');
+    var file = BotFiles.verification();
 
-    file.data.verification.messageId = msg.id;
-    file.data.verification.channelId = msg.channel.id;
-    file.data.verification.guildId = msg.guild!.id;
+    file.data.messageId = msg.id;
+    file.data.channelId = msg.channel.id;
+    file.data.guildId = msg.guild!.id;
 
-    fs.writeFile('./json/verification.json', JSON.stringify(file), err => {
-      console.log(err === null ? "No errors occoured during file writing" : `Error occoured during file writing: ${err}`);
-    });
+    FileManager.write(BotFiles.verification.prototype.path(), file);
   }
 
   resetVerificationData() {
-    var file = require('./json/verification.json');
+    var file = BotFiles.verification();
 
-    file.data.verification.messageId = null;
-    file.data.verification.channelId = null;
-    file.data.verification.guildId = null;
+    file.data.messageId = null;
+    file.data.channelId = null;
+    file.data.guildId = null;
 
-    fs.writeFile('./json/verification.json', JSON.stringify(file), err => {
-      console.log(err === null ? "No errors occoured during file writing" : `Error occoured during file writing: ${err}`);
-    });
+    FileManager.write(BotFiles.verification.prototype.path(), file);
   }
 
   async startListeners() {
     const guild: Guild = MainProcess.getClient().guilds.cache.find(guild => guild.id === this.guildId)!;
     const channel: GuildChannel = guild.channels.cache.get(this.channelId)!;
     if(!channel.isText()) return;
-    const msg: Message = await channel.messages.fetch(this.messageId);
+    const msg: Message | undefined = channel.messages.cache.get(this.messageId);
+    if(!msg) return;
 
     const c = msg.createReactionCollector(() => true, { dispose: true });
     c.on('collect', async (reaction, user) => {

@@ -25,12 +25,18 @@ var BotFiles = /** @class */ (function () {
     BotFiles.verification = function () {
         return require('./json/verification.json');
     };
+    BotFiles.events = function () {
+        return require('./json/events.json');
+    };
     BotFiles.init = function () {
         this.ticketing.prototype.path = function () {
             return './build/json/ticketing.json';
         };
         this.verification.prototype.path = function () {
             return './build/json/verification.json';
+        };
+        this.events.prototype.path = function () {
+            return './build/json/events.json';
         };
     };
     return BotFiles;

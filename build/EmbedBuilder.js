@@ -9,6 +9,7 @@ var EmbedBuilder = /** @class */ (function () {
     function EmbedBuilder() {
     }
     EmbedBuilder.getVerificationEmbed = function () {
+        //create rules embed for VerificationService
         var embed = new discord_js_1.default.MessageEmbed()
             .setColor('#ff0000')
             .setTitle(':wave: WILLKOMMEN')
@@ -33,6 +34,7 @@ var EmbedBuilder = /** @class */ (function () {
         return embed;
     };
     EmbedBuilder.getTicketingEmbed = function (user, content) {
+        //create custom embed for ticket
         var embed = new discord_js_1.default.MessageEmbed()
             .setColor('#ff0000')
             .setDescription(content)
@@ -41,6 +43,40 @@ var EmbedBuilder = /** @class */ (function () {
             .setAuthor(user.username, user.avatarURL())
             .setThumbnail('https://cdn.discordapp.com/icons/225279143934296070/41a551a5fb2f005439e63c3a59824288.png?size=256')
             .setFooter('DarkWarriors-Support');
+        return embed;
+    };
+    EmbedBuilder.getEventSummaryEmbed = function (userIds, contents) {
+        //create custom embed for event registration summory
+        var embed = new discord_js_1.default.MessageEmbed()
+            .setColor('#ff0000')
+            .setTitle('Event Anmeldungen:')
+            .setTimestamp()
+            .setThumbnail('https://cdn.discordapp.com/icons/225279143934296070/41a551a5fb2f005439e63c3a59824288.png?size=256')
+            .setFooter('DarkWarriors-Events');
+        var wentThrough = false;
+        for (var i = 0; i < userIds.length && userIds.length === contents.length; i++) {
+            var userId = userIds[i];
+            var content = contents[i];
+            embed.addField(content, "<@" + userId + ">", true);
+            wentThrough = true;
+        }
+        return wentThrough ? embed : null;
+    };
+    EmbedBuilder.getEventRegistrationEmbed = function (user, content, userEmbed) {
+        //create custom embed to send in the channel to receive the registrations for events
+        var embed = new discord_js_1.default.MessageEmbed()
+            .setColor('#ff0000')
+            .setAuthor(user.username, user.avatarURL())
+            .addField('Ingamename:', 'Discord-Tag:', true)
+            .addField(content, "<@" + user.id + ">", true)
+            .setTimestamp()
+            .setThumbnail('https://cdn.discordapp.com/icons/225279143934296070/41a551a5fb2f005439e63c3a59824288.png?size=256')
+            .setFooter('DarkWarriors-Events');
+        if (userEmbed) {
+            embed.setTitle('Du hast dich erfolgreich zum Event angemeldet.')
+                .setDescription('Um dich vom Event abzumelden reagiere unten mit ❌');
+        }
+        ;
         return embed;
     };
     return EmbedBuilder;
