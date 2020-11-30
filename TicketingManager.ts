@@ -57,8 +57,12 @@ export class TicketingManager {
         const embed: MessageEmbed = EmbedBuilder.getTicketingEmbed(user, supportContent[user.id].content);
 
         ticketTeamChannel.send(embed).then(() => {
-          user.send('Deine Supportanfrage hat uns gerade erreicht. Wir versuchen dir so schnell wie möglich zu helfen :D');
-          user.send(embed);
+          try {
+            user.send('Deine Supportanfrage hat uns gerade erreicht. Wir versuchen dir so schnell wie möglich zu helfen :D');
+            user.send(embed);
+          } catch(err) {
+            console.log('ERROR LOL');
+          }
           supportContent[user.id] = undefined;
         });
       }, 30000);

@@ -78,27 +78,27 @@ export class MessageHandler  {
     }
 
     //!!event
-    else if(msg.content.startsWith('!!event')) {
-      const args = msg.content.split(' ');
-      if(args.length === 2) {
-        if(args[1].toLowerCase() === 'start') {
-          eventRoleManager.startListening(msg.guild!);
-        }
-      } else if(args.length === 3) {
-        if(args[1].toLowerCase() === 'init') {
-          if(args[2].toLowerCase() === 'event') {
-            eventRoleManager.setupRegistrationChannel(msg.channel);
-          } else if(args[2].toLowerCase() === 'team') {
-            eventRoleManager.setupEventLogChannel(msg.channel);
-          }
-        } else if(args[1].toLowerCase() === 'role') {
-          const role: Role | undefined = this.getRoleFromMention(args[2], msg.guild!);
-          if(!role) return;
+    // else if(msg.content.startsWith('!!event')) {
+    //   const args = msg.content.split(' ');
+    //   if(args.length === 2) {
+    //     if(args[1].toLowerCase() === 'start') {
+    //       eventRoleManager.startListening(msg.guild!);
+    //     }
+    //   } else if(args.length === 3) {
+    //     if(args[1].toLowerCase() === 'init') {
+    //       if(args[2].toLowerCase() === 'event') {
+    //         eventRoleManager.setupRegistrationChannel(msg.channel);
+    //       } else if(args[2].toLowerCase() === 'team') {
+    //         eventRoleManager.setupEventLogChannel(msg.channel);
+    //       }
+    //     } else if(args[1].toLowerCase() === 'role') {
+    //       const role: Role | undefined = this.getRoleFromMention(args[2], msg.guild!);
+    //       if(!role) return;
 
-          eventRoleManager.setupEventRole(role);
-        }
-      }
-    }
+    //       eventRoleManager.setupEventRole(role);
+    //     }
+    //   }
+    // }
   }
 
   getUserFormMention() {
