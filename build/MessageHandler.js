@@ -44,7 +44,7 @@ var MessageHandler = /** @class */ (function () {
     }
     MessageHandler.prototype.handleServerMessage = function (msg) {
         return __awaiter(this, void 0, void 0, function () {
-            var verificationService, ticketingManager, eventRoleManager, member, args, file, args, role;
+            var verificationService, ticketingManager, eventRoleManager, member, args, file;
             return __generator(this, function (_a) {
                 verificationService = index_1.MainProcess.getVerificationInstance();
                 ticketingManager = index_1.MainProcess.getTicketingManager();
@@ -112,31 +112,6 @@ var MessageHandler = /** @class */ (function () {
                                 //do team channel setup
                                 ticketingManager.setupTeamChannel(msg.channel);
                             }
-                        }
-                    }
-                }
-                //!!event
-                else if (msg.content.startsWith('!!event')) {
-                    args = msg.content.split(' ');
-                    if (args.length === 2) {
-                        if (args[1].toLowerCase() === 'start') {
-                            eventRoleManager.startListening(msg.guild);
-                        }
-                    }
-                    else if (args.length === 3) {
-                        if (args[1].toLowerCase() === 'init') {
-                            if (args[2].toLowerCase() === 'event') {
-                                eventRoleManager.setupRegistrationChannel(msg.channel);
-                            }
-                            else if (args[2].toLowerCase() === 'team') {
-                                eventRoleManager.setupEventLogChannel(msg.channel);
-                            }
-                        }
-                        else if (args[1].toLowerCase() === 'role') {
-                            role = this.getRoleFromMention(args[2], msg.guild);
-                            if (!role)
-                                return [2 /*return*/];
-                            eventRoleManager.setupEventRole(role);
                         }
                     }
                 }

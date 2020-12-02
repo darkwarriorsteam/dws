@@ -83,8 +83,9 @@ export class VerificationService {
     const guild: Guild = MainProcess.getClient().guilds.cache.find(guild => guild.id === this.guildId)!;
     const channel: GuildChannel = guild.channels.cache.get(this.channelId)!;
     if(!channel.isText()) return;
-    const msg: Message | undefined = channel.messages.cache.get(this.messageId);
-    if(!msg) return;
+    console.log('Verification Service || Found channel from configured id');
+    const msg: Message = await channel.messages.fetch(this.messageId);
+    console.log('Verification Service || Starting Listeners was successful');
 
     const c = msg.createReactionCollector(() => true, { dispose: true });
     c.on('collect', async (reaction, user) => {

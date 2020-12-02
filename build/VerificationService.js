@@ -143,9 +143,11 @@ var VerificationService = /** @class */ (function () {
                         channel = guild.channels.cache.get(this.channelId);
                         if (!channel.isText())
                             return [2 /*return*/];
+                        console.log('Verification Service || Found channel from configured id');
                         return [4 /*yield*/, channel.messages.fetch(this.messageId)];
                     case 1:
                         msg = _a.sent();
+                        console.log('Verification Service || Starting Listeners was successful');
                         c = msg.createReactionCollector(function () { return true; }, { dispose: true });
                         c.on('collect', function (reaction, user) { return __awaiter(_this, void 0, void 0, function () {
                             var member, _a, _b, _i, i, _c, _d, _e, i;

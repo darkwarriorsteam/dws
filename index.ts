@@ -36,7 +36,7 @@ export class MainProcess {
 
   static loginClient() {
     //login client with token
-    client.login(process.env.DCTKN_TEST);
+    client.login(process.env.DCTKN);
   }
 
   static assignEvents() {

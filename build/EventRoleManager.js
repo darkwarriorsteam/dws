@@ -81,9 +81,13 @@ var EventRoleManager = /** @class */ (function () {
         c.on('collect', function (msg) {
             var user = msg.author;
             var member = msg.guild.member(user);
+            if (userIds.includes(user.id))
+                return;
             var embed = EmbedBuilder_1.EmbedBuilder.getEventRegistrationEmbed(user, msg.content, false);
             eventChannel.send(embed);
             embed = EmbedBuilder_1.EmbedBuilder.getEventRegistrationEmbed(user, msg.content, true);
+            userIds.push(user.id);
+            contents.push(msg.content);
             user.send(embed).then(function (msg) { return __awaiter(_this, void 0, void 0, function () {
                 var rC;
                 return __generator(this, function (_a) {
@@ -110,10 +114,6 @@ var EventRoleManager = /** @class */ (function () {
                     }
                 });
             }); });
-            if (!userIds.includes(user.id)) {
-                userIds.push(user.id);
-                contents.push(msg.content);
-            }
             console.log("EventService || User " + user.tag + " registered to participate in Event");
             member.roles.add(eventRole);
             console.log("EventService || User " + user.tag + " received Event-Role");

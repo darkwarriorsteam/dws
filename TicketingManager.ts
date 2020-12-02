@@ -1,6 +1,5 @@
 import { time } from "console";
 import { DMChannel, Guild, GuildChannel, GuildMember, Message, MessageEmbed, TextChannel, User } from "discord.js";
-import { userInfo } from "os";
 import { EmbedBuilder } from "./EmbedBuilder";
 import { FileManager, BotFiles } from './FileManager';
 
@@ -61,7 +60,7 @@ export class TicketingManager {
             user.send('Deine Supportanfrage hat uns gerade erreicht. Wir versuchen dir so schnell wie möglich zu helfen :D');
             user.send(embed);
           } catch(err) {
-            console.log('ERROR LOL');
+            console.log('Ticketing Service || ');
           }
           supportContent[user.id] = undefined;
         });

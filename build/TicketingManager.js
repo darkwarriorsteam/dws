@@ -51,8 +51,13 @@ var TicketingManager = /** @class */ (function () {
                 var user = msg.author;
                 var embed = EmbedBuilder_1.EmbedBuilder.getTicketingEmbed(user, supportContent[user.id].content);
                 ticketTeamChannel.send(embed).then(function () {
-                    user.send('Deine Supportanfrage hat uns gerade erreicht. Wir versuchen dir so schnell wie möglich zu helfen :D');
-                    user.send(embed);
+                    try {
+                        user.send('Deine Supportanfrage hat uns gerade erreicht. Wir versuchen dir so schnell wie möglich zu helfen :D');
+                        user.send(embed);
+                    }
+                    catch (err) {
+                        console.log('Ticketing Service || ');
+                    }
                     supportContent[user.id] = undefined;
                 });
             }, 30000);

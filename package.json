@@ -1,6 +1,6 @@
 {
   "name": "darkwarriors-support",
-  "version": "2.2.1",
+  "version": "2.2.2",
   "description": "Dark Warriors Support BotJS",
   "main": "index.js",
   "scripts": {

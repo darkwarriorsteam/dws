@@ -71,7 +71,7 @@ var MainProcess = /** @class */ (function () {
     };
     MainProcess.loginClient = function () {
         //login client with token
-        client.login(process.env.DCTKN_TEST);
+        client.login(process.env.DCTKN);
     };
     MainProcess.assignEvents = function () {
         var _this = this;
