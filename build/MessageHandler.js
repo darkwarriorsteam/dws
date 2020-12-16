@@ -44,9 +44,9 @@ var MessageHandler = /** @class */ (function () {
     }
     MessageHandler.prototype.handleServerMessage = function (msg) {
         return __awaiter(this, void 0, void 0, function () {
-            var verificationService, ticketingManager, eventRoleManager, member, args, file;
+            var verificationManager, ticketingManager, eventRoleManager, member, args, file;
             return __generator(this, function (_a) {
-                verificationService = index_1.MainProcess.getVerificationInstance();
+                verificationManager = index_1.MainProcess.getVerificationManager();
                 ticketingManager = index_1.MainProcess.getTicketingManager();
                 eventRoleManager = index_1.MainProcess.getEventRoleManager();
                 //Return if author is bot
@@ -63,12 +63,12 @@ var MessageHandler = /** @class */ (function () {
                         msg.delete();
                         return [2 /*return*/];
                     }
-                    if (verificationService.messageId === null || verificationService.guildId === null || verificationService.channelId === null) {
-                        verificationService.sendValidationMessage(msg);
+                    if (verificationManager.messageId === null || verificationManager.guildId === null || verificationManager.channelId === null) {
+                        verificationManager.sendValidationMessage(msg);
                         console.log("Verification Service || User " + msg.author.tag + " created the verification message in channel " + msg.channel + ".");
                     }
                     else {
-                        msg.channel.send("There is already a verification message in a channel. Channel ID: " + verificationService.channelId);
+                        msg.channel.send("There is already a verification message in a channel. Channel ID: " + verificationManager.channelId);
                         console.log("Verification Service || User " + msg.author.tag + " tried to overwrite the verification message.");
                     }
                     msg.delete();
@@ -80,8 +80,8 @@ var MessageHandler = /** @class */ (function () {
                         console.log("Verification Service || User " + msg.author.tag + " tried to reset the verification message whilst no permission to do so.");
                         return [2 /*return*/];
                     }
-                    verificationService.resetVerificationData();
-                    verificationService.refreshOnReset();
+                    verificationManager.resetVerificationData();
+                    verificationManager.refreshOnReset();
                     console.log("Verification Service || Reset was successful. Initiated by " + msg.author.tag);
                     msg.delete();
                 }
@@ -122,13 +122,29 @@ var MessageHandler = /** @class */ (function () {
     MessageHandler.prototype.getUserFormMention = function () {
         //not implemented
     };
+    //returns the role mentioned in a message
+    //the method extracts the roleId from the the string mention (format: "<@&roleId>") by slicing the first 3 and the last char
+    //example:
+    //
+    // for mention = '<@&778718072848121916>' the method will return the 'Event'-Role as a Discord.Role
+    //
     MessageHandler.prototype.getRoleFromMention = function (mention, guild) {
+        //if mention is undefined or null return undefined as it cannot be a valid role
         if (!mention)
             return undefined;
-        if (mention.startsWith('<@&') && mention.endsWith('>')) {
+        //if the mention has the right syntax then slice the string
+        if (mention.match('(<@&)([0-9]+)(>))')) {
+            //slice off the first 3 and the last character to get the id
+            //
+            // <@&id> => (<@&)  id  (>)
+            //
             mention = mention.slice(3, -1);
+            //return the role found in the guild via the id
+            //if the role doesnt exist or the id isn't correct guild.roles.cache.get(id) will evaluate to undefined therefore
+            //  returning undefined for missing role or wrong id format
             return guild.roles.cache.get(mention);
         }
+        //return undefined if mention is not following the pattern <@&
         return undefined;
     };
     return MessageHandler;

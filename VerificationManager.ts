@@ -1,11 +1,10 @@
 var Discord = require('discord.js');
 import { EmbedBuilder } from './EmbedBuilder';
-import { Guild, GuildChannel, GuildMember, Message, MessageEmbed } from 'discord.js';
-import fs from 'fs';
+import { Guild, GuildChannel, GuildMember, Message, MessageEmbed, MessageReaction } from 'discord.js';
 import { MainProcess } from './index';
 import { BotFiles, FileManager } from './FileManager';
 
-export class VerificationService {
+export class VerificationManager {
   messageId: any;
   channelId: any;
   guildId: any;
@@ -107,13 +106,55 @@ export class VerificationService {
     });
 
     c.on('remove', async (reaction, user) => {
+      if(reaction.emoji.name !== '✅') return;
       const member: GuildMember = msg.guild!.member(user)!;
-      await member.roles.remove(member.roles.cache);
-      for(var i in this.defaultRoles) {
-        member.roles.add(msg.guild!.roles.cache.find(role => role.name === this.defaultRoles[i])!);
-      }
-      console.log(`Verification Service || Removed all roles from ${user.tag} and given back the defaults. (${this.defaultRoles})`);
-      console.log(`Verification Service || Member ${user.tag} unverified.`);
+      var message: Message;
+      await member.send(`Du bist gerade dabei deine Regelbestätigung zurückzuziehen, das bedeutet du verlierst alle deine Rollen. ` +
+      'Bitte bestätige erneut, dass du die Regeln nicht weiter akzeptierst indem du auf ❌ klickst. Wenn du dich nur verklickt hast, ' +
+      'dann brauchst du nichts machen :D').then((msg) => {
+        message = msg;
+        this.processMessageForUser(msg, message, reaction, member);
+      }).catch(async () => {
+        await reaction.message.channel.send(`Du, <@${user.id}>, bist gerade dabei deine Regelbestätigung zurückzuziehen,` +
+        'das bedeutet du verlierst alle deine Rollen. Bitte bestätige erneut, dass du die Regeln nicht weiter akzeptierst ' +
+        'indem du auf ❌ klickst. Wenn du dich nur verklickt hast, dann brauchst du nichts machen :D').then((msg) => {
+          message = msg;
+          this.processMessageForUser(msg, message, reaction, member);
+        });
+      });
     });
+  }
+  async processMessageForUser(msg: Message, message: Message, reaction: MessageReaction, member: GuildMember) {
+    const user = member.user;
+    await message.react('❌');
+      const collector = message.createReactionCollector(() => true, {});
+
+      collector.on('collect', async (r, u) => {
+        if(r.emoji.name !== '❌') return;
+        if(u.id === user.id) {
+          console.log(`Verification Service || ${user.tag} verified removal of roles`);
+          await member.roles.remove(member.roles.cache);
+          for(var i in this.defaultRoles) {
+            member.roles.add(msg.guild!.roles.cache.find(role => role.name === this.defaultRoles[i])!);
+          }
+          console.log(`Verification Service || Removed all roles from ${user.tag} and given back the defaults. (${this.defaultRoles})`);
+          console.log(`Verification Service || Member ${user.tag} unverified.`);
+          collector.stop('Removal verified.');
+          reaction.users.remove(u);
+        } else {
+          r.users.remove(u);
+        }
+      });
+
+      collector.on('end', (_collected, reason) => {
+        console.log('Verification Service || Removed reaction collector for role removal approval.');
+        console.log(`                           Reason being: ${reason}`);
+        collector.message.delete();
+      });
+
+      setTimeout(() => {
+        collector.stop('Time to verify ran out');
+      }, 60000);
+      return false;
   }
 }

@@ -39,7 +39,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MainProcess = void 0;
 var discord_js_1 = require("discord.js");
 var client = new discord_js_1.Client({ partials: ['REACTION', 'MESSAGE', 'USER', 'CHANNEL', 'GUILD_MEMBER'] });
-var VerificationService_1 = require("./VerificationService");
+var VerificationManager_1 = require("./VerificationManager");
 var MessageHandler_1 = require("./MessageHandler");
 var process_1 = require("process");
 var TicketingManager_1 = require("./TicketingManager");
@@ -47,7 +47,7 @@ var FileManager_1 = require("./FileManager");
 var EventRoleManager_1 = require("./EventRoleManager");
 //create classes to handle features
 var mh = new MessageHandler_1.MessageHandler();
-var vs = new VerificationService_1.VerificationService();
+var vs = new VerificationManager_1.VerificationManager();
 var tm = new TicketingManager_1.TicketingManager();
 var erm = new EventRoleManager_1.EventRoleManager();
 var MainProcess = /** @class */ (function () {
@@ -57,11 +57,11 @@ var MainProcess = /** @class */ (function () {
     MainProcess.getTicketingManager = function () {
         return tm;
     };
-    //returns VerificationService instance
-    MainProcess.getVerificationInstance = function () {
+    //returns VerificationManager instance
+    MainProcess.getVerificationManager = function () {
         return vs;
     };
-    //returns VerificationService instance
+    //returns EventRoleManager instance
     MainProcess.getEventRoleManager = function () {
         return erm;
     };
@@ -70,12 +70,18 @@ var MainProcess = /** @class */ (function () {
         return client;
     };
     MainProcess.loginClient = function () {
+        console.log('');
+        console.log('-------------------------------------------------');
+        console.log("------------     " + new Date().toDateString() + "     ------------");
+        console.log('-------------------------------------------------');
+        console.log('');
         //login client with token
-        client.login(process.env.DCTKN);
+        client.login(process.env.DCTKN_TEST);
+        this.startBackupService();
     };
     MainProcess.assignEvents = function () {
         var _this = this;
-        //when client is ready this event fires
+        //whenever client is ready
         client.on('ready', function () { return __awaiter(_this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 //check if client user is null
@@ -85,22 +91,32 @@ var MainProcess = /** @class */ (function () {
                     return [2 /*return*/];
                 }
                 console.log("Logged in as " + client.user.tag);
-                //make prototype.path for files
+                //make prototype.path for files to address files later
                 FileManager_1.BotFiles.init();
-                //start VerificationService instance
+                //start VerificationManager
                 vs.start();
-                console.log(1, vs);
+                console.log('Please start services via discord: !!ticket start & more coming soon');
                 return [2 /*return*/];
             });
         }); });
-        //event fires when bot receives message from all sources
+        //whenever bot receives message from all sources
         client.on('message', function (msg) { return __awaiter(_this, void 0, void 0, function () {
             return __generator(this, function (_a) {
-                //handle message from guilds
-                mh.handleServerMessage(msg);
+                //check if message is not a direct message
+                if (msg.channel.type !== 'dm') {
+                    //handle message from guilds
+                    mh.handleServerMessage(msg);
+                }
                 return [2 /*return*/];
             });
         }); });
+    };
+    MainProcess.startBackupService = function () {
+        var _this = this;
+        setTimeout(function () {
+            FileManager_1.BotFiles.backupAll();
+            _this.startBackupService();
+        }, 60000);
     };
     return MainProcess;
 }());
